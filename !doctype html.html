@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="ar" dir="rtl" style="--primary: #a34d65; --secondary: #22a2e2; --paper: #fffaf7; --ink: #38252a;">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>سُكّر زيادة | قائمة الحلويات</title>
+<style>
+:root{--primary:#a34d65;--secondary:#f5e2e6;--paper:#fffaf7;--ink:#38252a;--hero-image:none;--body-image:none}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Tahoma,Arial,sans-serif;background-image:var(--body-image);background-size:cover;background-attachment:fixed}
+header{min-height:260px;text-align:center;padding:65px 18px 55px;background:linear-gradient(#f5e2e6b8,#f5e2e6b8),var(--hero-image),var(--secondary);background-position:center;background-size:cover}
+header h1{font-size:clamp(36px,7vw,66px);margin:0 0 12px}
+header p{font-size:18px;margin:0}
+.wrap{max-width:1120px;margin:auto;padding:30px 20px 70px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+h2{margin:0;font-size:24px}
+button{border:0;border-radius:12px;padding:12px 17px;background:var(--primary);color:white;font-weight:bold;cursor:pointer;font-family:inherit}
+button:disabled{opacity:.6;cursor:not-allowed}
+button.secondary{background:#fff;color:var(--primary);border:1px solid var(--primary)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:20px}
+.item{position:relative;background:#fff;border-radius:19px;overflow:hidden;box-shadow:0 5px 24px #47202b1a}
+.item img{width:100%;height:220px;object-fit:cover;display:block;background:#f4e8e8}
+.info{padding:16px}
+.info h3{margin:0 0 9px;font-size:21px}
+.info p{margin:0;color:#7b5961;min-height:24px}
+.price{display:block;color:var(--primary);font-size:19px;font-weight:bold;margin-top:12px}
+.editor{display:none;background:#fff;border:1px solid #edd0d8;border-radius:20px;padding:24px;margin:20px 0 30px}
+.editor.active{display:block}
+.editor h3{margin:0 0 14px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.field{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:bold}
+.field input,.field textarea{width:100%;padding:11px;border:1px solid #d9bec5;border-radius:9px;font:inherit;background:#fff}
+.field input[type=color]{height:44px;padding:4px}
+.field input[type=file]{font-size:12px}
+.help{font-size:13px;color:#78545c;line-height:1.8}
+.divider{border:0;border-top:1px solid #f0dce1;margin:24px 0}
+.edit-item{border:1px solid #ead6db;border-radius:13px;padding:14px;margin:12px 0}
+.edit-item .fields{margin:10px 0}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.small{padding:9px 12px;font-size:13px}
+.foot{text-align:center;padding:24px;color:#78545c}
+.notice{background:#fff6db;padding:12px;border-radius:9px;margin:15px 0;font-size:13px;line-height:1.8}
+.quantity-control{position:absolute;top:12px;left:12px;z-index:5;display:flex;align-items:center;gap:8px;padding:6px 8px;background:#fffaf7;border:1px solid #ead6db;border-radius:999px;box-shadow:0 3px 12px #47202b22}
+.quantity-control button{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;min-width:30px;padding:0;border-radius:50%;font-size:20px;line-height:1}
+.quantity-control button:disabled{opacity:.4;cursor:not-allowed}
+.quantity-control span{min-width:20px;text-align:center;font-weight:bold;font-size:14px}
+.submit-order-btn{background:#f8e9ed;color:#a34d65;border:1px solid #f1dce2;border-radius:999px;padding:11px 22px;font-size:14px;font-weight:600;opacity:.95;box-shadow:0 2px 10px #47202b12;transition:opacity .2s,background .2s}
+.submit-order-btn:hover{opacity:1;background:#f4dfe5}
+.saved-orders-shortcut{position:fixed;left:14px;bottom:14px;z-index:21;width:42px;height:42px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,250,247,.78);color:#a9828d;border:1px solid rgba(163,77,101,.18);box-shadow:0 2px 9px rgba(56,37,42,.10);opacity:.78;font-size:18px;backdrop-filter:blur(3px);transition:opacity .2s,background .2s}
+.saved-orders-shortcut:hover{opacity:1;background:rgba(255,250,247,.95)}
+.order-overlay{display:none;position:fixed;inset:0;z-index:40;background:#38252a66;align-items:center;justify-content:center;padding:18px}
+.order-overlay.active{display:flex}
+.order-dialog{width:min(420px,100%);background:#fffaf7;border:1px solid #f0dce1;border-radius:20px;padding:24px;box-shadow:0 15px 50px #38252a33}
+.order-dialog h2{margin:0 0 12px}
+.order-dialog input{width:100%;padding:12px;border:1px solid #e5cbd2;border-radius:10px;font:inherit;margin:8px 0 16px}
+.order-page{display:none;max-width:900px;margin:28px auto;padding:24px 20px 60px}
+.order-page.active{display:block}
+.order-page h2{margin-bottom:18px}
+.order-card{background:#fff;border:1px solid #eddde1;border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 4px 16px #47202b0d}
+.order-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.order-card h3{margin:0 0 6px}
+.order-card ul{margin:10px 0;padding-right:22px;line-height:1.9}
+.order-meta{color:#8a6870;font-size:13px}
+.empty-orders{background:#fff;border:1px dashed #e5cbd2;border-radius:16px;padding:28px;text-align:center;color:#8a6870}
+@media(max-width:550px){header{min-height:210px;padding:52px 14px}.wrap{padding:20px 14px}.item img{height:200px}.saved-orders-shortcut{left:10px;bottom:10px;width:40px;height:40px}}
+</style>
+</head>
+<body>
+
+<header id="mainHeader">
+  <h1 id="shopTitle">🍰 سُكَّر زِيادَة 🍫</h1>
+  <p id="shopSubtitle">ضيفتَنا العزيزةَ، مِنْ صفحاتِ قصَّتِكِ وُلِدَتْ فِكرتُنا، واليومَ ندعوكِ إلى اِختيارِ ما يحلو لَكِ مِنْ قائِمَتِنا، فحُضورُكِ هُوَ الّذي يُضفي على حكايتِنا حَلاوتَها...</p>
+</header>
+
+<main class="wrap" id="mainWrap">
+  <div class="top">
+    <h2>قائمة الحلويات 🍰</h2>
+    <div class="actions" style="margin:0">
+      <button id="toggleEditor" onclick="toggleEditor()">✏️ تعديل المنيو</button>
+    </div>
+  </div>
+
+  <section class="editor" id="editor">
+    <h3>تعديل اسم المحلّ والتصميم</h3>
+    <div class="fields">
+      <label class="field">اسم المحلّ<input id="nameInput" oninput="updateSetting('name',this.value)"></label>
+      <label class="field">الجملة تحت الاسم<input id="tagInput" oninput="updateSetting('tagline',this.value)"></label>
+      <label class="field">اللون الأساسي<input type="color" id="primaryInput" oninput="updateSetting('primary',this.value)"></label>
+      <label class="field">لون خلفيّة العنوان<input type="color" id="secondaryInput" oninput="updateSetting('secondary',this.value)"></label>
+      <label class="field">لون خلفيّة الصفحة<input type="color" id="paperInput" oninput="updateSetting('paper',this.value)"></label>
+      <label class="field">لون الكتابة<input type="color" id="inkInput" oninput="updateSetting('ink',this.value)"></label>
+      <label class="field">صورة خلفيّة العنوان<input type="file" accept="image/*" onchange="loadSettingImage(event,'hero')"></label>
+      <label class="field">صورة خلفيّة الصفحة<input type="file" accept="image/*" onchange="loadSettingImage(event,'body')"></label>
+    </div>
+    <div class="actions">
+      <button class="secondary small" onclick="removeBackground('hero')">إزالة خلفيّة العنوان</button>
+      <button class="secondary small" onclick="removeBackground('body')">إزالة خلفيّة الصفحة</button>
+    </div>
+    <hr class="divider">
+    <h3>تعديل أصناف الحلويات</h3>
+    <div id="itemEditors"></div>
+    <div class="actions">
+      <button onclick="addItem()">+ إضافة صنف</button>
+      <button onclick="exportHTML()">⬇️ تصدير HTML المعدّل</button>
+      <button class="secondary" onclick="toggleEditor()">✓ إنهاء التعديل</button>
+    </div>
+  </section>
+
+  <section class="grid" id="menu"></section>
+</main>
+
+<div style="text-align:center;margin:8px 0 18px" id="submitArea">
+  <button type="button" class="submit-order-btn" onclick="openOrderDialog()">إرسال الطلب</button>
+</div>
+
+<button type="button" class="saved-orders-shortcut" title="الطلبات المحفوظة" aria-label="الطلبات المحفوظة" onclick="openSavedOrdersPage()">🧾</button>
+
+<div class="order-overlay" id="orderOverlay" onclick="if(event.target===this)closeOrderDialog()">
+  <div class="order-dialog">
+    <h2>تأكيد الطلب</h2>
+    <label for="customerNameInput">اكتبي اسمكِ لحفظ الطلب:</label>
+    <input id="customerNameInput" type="text" placeholder="الاسم">
+    <div id="orderStatusMsg" style="font-size:13px;color:#a34d65;margin-bottom:10px"></div>
+    <div class="actions" style="margin-top:0">
+      <button type="button" id="confirmOrderBtn" onclick="submitCustomerOrder()">حفظ وإرسال</button>
+      <button type="button" class="secondary" onclick="closeOrderDialog()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<section class="order-page" id="savedOrdersPage" aria-label="الطلبات المحفوظة">
+  <div class="top">
+    <h2>الطلبات المحفوظة (مزامنة بين الأجهزة) 🧾</h2>
+    <div class="actions" style="margin:0">
+      <button type="button" class="secondary small" onclick="renderSavedOrders()">🔄 تحديث</button>
+      <button type="button" class="secondary small" onclick="clearAllCloudOrders()">🗑️ مسح الكل</button>
+      <button type="button" class="secondary small" onclick="closeSavedOrdersPage()">العودة للمنيو</button>
+    </div>
+  </div>
+  <div id="savedOrdersList"></div>
+</section>
+
+<footer class="foot" id="mainFooter">قائمة سُكّر زيادة — جاهزة للمشاركة عبر QR Code</footer>
+
+<script>
+// ==========================================
+// 1. CLOUD DATABASE SETTINGS (JSONBin.io)
+// ==========================================
+const BIN_ID = '6afb3c2cac6210605a8c91bf';
+const API_KEY = '$2a$10$Ahv.T/SqjjQjlxnJo.7eqele4TbIOZkubQ.K3yk62WhYB3DZjvL2C';
+const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+// ==========================================
+// 2. MENU DATA & RENDERING
+// ==========================================
+let menuData = {
+  settings: {
+    name: "🍰 سُكَّر زِيادَة 🍫",
+    tagline: "ضيفتَنا العزيزةَ، مِنْ صفحاتِ قصَّتِكِ وُلِدَتْ فِكرتُنا، واليومَ ندعوكِ إلى اِختيارِ ما يحلو لَكِ مِنْ قائِمَتِنا، فحُضورُكِ هُوَ الّذي يُضفي على حكايتِنا حَلاوتَها...",
+    primary: "#a34d65",
+    secondary: "#22a2e2",
+    paper: "#fffaf7",
+    ink: "#38252a",
+    hero: "",
+    body: ""
+  },
+  items: [
+    { name: "ماكرون آيا", price: "الثَّمنُ؟ اِبتسامةٌ مِنْكِ تكفي!", description: "ألوانٌ تُبهجُ العينَ، ونكهاتٌ تُدلِّلُ الذََّوقَ", image: "https://images.unsplash.com/photo-1569864358642-9d1684040f43?w=800&q=80", qty: 0 },
+    { name: "إكلير جيوفانّي", price: "الثَّمنُ؟ يكفينا شرفُ اِستضافتِكِ!", description: "عجينةٌ هشَّةٌ تحتضِنُ كريمةً ناعِمَةً، وتُتوَّجُ بِالشّوكولا الغنِيَّةِ", image: "https://images.unsplash.com/photo-1612203985729-70726954388c?w=800&q=80", qty: 0 },
+    { name: "صفوف ماغالي", price: "الثَّمنُ؟ حُضورُكِ أجملُ هدِيَّةٍ!", description: "حلاوةٌ ذهبِيَّةٌ، تحملُ في كُلِّ لقمةٍ عبقَ التُّراثِ ودفءَ البيتِ", image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=800&q=80", qty: 0 },
+    { name: "براونيز جيا", price: "الثَّمنُ؟ الضّيافةُ محبَّةٌ لا تُباعُ!", description: "قِطعةٌ غنِيَّةٌ بِالشّوكولا، بِقوامٍ طرِيٍّ ومذاقٍ يُغري بِلقمةٍ ثانِيَةٍ", image: "https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=800&q=80", qty: 0 },
+    { name: "كوكيز إيّلا", price: "الثَّمنُ؟ حلاوةُ اللِّقاءِ أغلى مِنْ كُلِّ الأثمانِ!", description: "قرمشةٌ تُخفي حِكايةً مِنَ الحلاوةِ", image: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=800&q=80", qty: 0 }
+  ]
+};
+
+function renderMenu() {
+  const menuEl = document.getElementById('menu');
+  menuEl.innerHTML = menuData.items.map((item, idx) => `
+    <article class="item">
+      <div class="quantity-control" aria-label="تحديد الكمية">
+        <button type="button" onclick="changeQty(${idx}, 1)">+</button>
+        <span>${item.qty}</span>
+        <button type="button" onclick="changeQty(${idx}, -1)" ${item.qty === 0 ? 'disabled' : ''}>−</button>
+      </div>
+      <img loading="lazy" src="${item.image || 'https://via.placeholder.com/400x220?text=Dessert'}" alt="${item.name}">
+      <div class="info">
+        <h3>${item.name}</h3>
+        <p>${item.description}</p>
+        <span class="price">${item.price}</span>
+      </div>
+    </article>
+  `).join('');
+}
+
+function changeQty(idx, delta) {
+  menuData.items[idx].qty = Math.max(0, (menuData.items[idx].qty || 0) + delta);
+  renderMenu();
+}
+
+// ==========================================
+// 3. FETCH API: MULTI-DEVICE SYNC FUNCTIONS
+// ==========================================
+async function fetchOrdersFromCloud() {
+  const res = await fetch(`${API_URL}/latest`, {
+    method: 'GET',
+    headers: {
+      'X-Master-Key': API_KEY
+    }
+  });
+  if (!res.ok) throw new Error('فشل الاتصال بقاعدة البيانات');
+  const data = await res.json();
+  return data.record.orders || [];
+}
+
+async function saveOrdersToCloud(ordersArray) {
+  const res = await fetch(API_URL, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Master-Key': API_KEY
+    },
+    body: JSON.stringify({ orders: ordersArray })
+  });
+  if (!res.ok) throw new Error('فشل حفظ الطلب في السحابة');
+  return await res.json();
+}
+
+// ==========================================
+// 4. ORDER DIALOG & SUBMISSION
+// ==========================================
+function openOrderDialog() {
+  const selected = menuData.items.filter(i => i.qty > 0);
+  if (selected.length === 0) {
+    alert('الرجاء اختيار صنف واحد على الأقل قبل إرسال الطلب.');
+    return;
+  }
+  document.getElementById('orderStatusMsg').textContent = '';
+  document.getElementById('orderOverlay').classList.add('active');
+}
+
+function closeOrderDialog() {
+  document.getElementById('orderOverlay').classList.remove('active');
+}
+
+async function submitCustomerOrder() {
+  const nameInput = document.getElementById('customerNameInput');
+  const customerName = nameInput.value.trim();
+  const statusMsg = document.getElementById('orderStatusMsg');
+  const btn = document.getElementById('confirmOrderBtn');
+
+  if (!customerName) {
+    statusMsg.textContent = 'الرجاء كتابة الاسم أولاً.';
+    return;
+  }
+
+  const chosenItems = menuData.items
+    .filter(item => item.qty > 0)
+    .map(item => ({ name: item.name, qty: item.qty }));
+
+  const newOrder = {
+    id: Date.now(),
+    customer: customerName,
+    time: new Date().toLocaleString('ar-LB'),
+    items: chosenItems
+  };
+
+  try {
+    btn.disabled = true;
+    statusMsg.textContent = 'جاري إرسال الطلب وحفظه على جميع الأجهزة...';
+
+    // 1. Fetch existing orders from cloud so we don't overwrite other devices
+    const existingOrders = await fetchOrdersFromCloud();
+
+    // 2. Add the new order to the top of the list
+    existingOrders.unshift(newOrder);
+
+    // 3. Save the updated list back to the cloud
+    await saveOrdersToCloud(existingOrders);
+
+    // Reset quantities on screen
+    menuData.items.forEach(item => item.qty = 0);
+    nameInput.value = '';
+    renderMenu();
+    closeOrderDialog();
+    alert('تم حفظ الطلب بنجاح! سيظهر الآن على جميع الأجهزة.');
+  } catch (err) {
+    console.error(err);
+    statusMsg.textContent = 'حدث خطأ: تأكد من إدخال BIN_ID و API_KEY بشكل صحيح.';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ==========================================
+// 5. SAVED ORDERS PAGE (SHARED VIEW)
+// ==========================================
+function openSavedOrdersPage() {
+  document.getElementById('mainHeader').style.display = 'none';
+  document.getElementById('mainWrap').style.display = 'none';
+  document.getElementById('submitArea').style.display = 'none';
+  document.getElementById('mainFooter').style.display = 'none';
+  document.getElementById('savedOrdersPage').classList.add('active');
+  renderSavedOrders();
+}
+
+function closeSavedOrdersPage() {
+  document.getElementById('savedOrdersPage').classList.remove('active');
+  document.getElementById('mainHeader').style.display = '';
+  document.getElementById('mainWrap').style.display = '';
+  document.getElementById('submitArea').style.display = '';
+  document.getElementById('mainFooter').style.display = '';
+}
+
+async function renderSavedOrders() {
+  const listEl = document.getElementById('savedOrdersList');
+  listEl.innerHTML = '<div class="empty-orders">جاري تحميل الطلبات من السحابة... ⏳</div>';
+
+  try {
+    const orders = await fetchOrdersFromCloud();
+    if (orders.length === 0) {
+      listEl.innerHTML = '<div class="empty-orders">لا توجد طلبات محفوظة حالياً.</div>';
+      return;
+    }
+
+    listEl.innerHTML = orders.map((order, index) => `
+      <div class="order-card">
+        <div class="order-card-head">
+          <div>
+            <h3>👤 ${escapeHtml(order.customer)}</h3>
+            <div class="order-meta">🕒 ${escapeHtml(order.time)}</div>
+          </div>
+          <button type="button" class="secondary small" onclick="deleteSingleOrder(${index})">✓ تم / حذف</button>
+        </div>
+        <ul>
+          ${order.items.map(i => `<li><strong>${escapeHtml(i.name)}</strong> — الكمية: ${i.qty}</li>`).join('')}
+        </ul>
+      </div>
+    `).join('');
+  } catch (err) {
+    listEl.innerHTML = '<div class="empty-orders">تعذّر تحميل الطلبات. تأكد من الاتصال بالإنترنت وإعدادات BIN_ID.</div>';
+  }
+}
+
+async function deleteSingleOrder(index) {
+  try {
+    const orders = await fetchOrdersFromCloud();
+    orders.splice(index, 1);
+    await saveOrdersToCloud(orders);
+    renderSavedOrders();
+  } catch (err) {
+    alert('فشل حذف الطلب.');
+  }
+}
+
+async function clearAllCloudOrders() {
+  if (!confirm('هل أنت متأكد من مسح جميع الطلبات من كافة الأجهزة؟')) return;
+  try {
+    await saveOrdersToCloud([]);
+    renderSavedOrders();
+  } catch (err) {
+    alert('فشل مسح الطلبات.');
+  }
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+}
+
+// ==========================================
+// 6. MENU EDITOR HELPERS
+// ==========================================
+function toggleEditor() {
+  const ed = document.getElementById('editor');
+  ed.classList.toggle('active');
+  if (ed.classList.contains('active')) renderEditors();
+}
+
+function renderEditors() {
+  document.getElementById('nameInput').value = menuData.settings.name;
+  document.getElementById('tagInput').value = menuData.settings.tagline;
+  document.getElementById('primaryInput').value = menuData.settings.primary;
+  document.getElementById('secondaryInput').value = menuData.settings.secondary;
+  document.getElementById('paperInput').value = menuData.settings.paper;
+  document.getElementById('inkInput').value = menuData.settings.ink;
+
+  document.getElementById('itemEditors').innerHTML = menuData.items.map((item, idx) => `
+    <div class="edit-item">
+      <strong>الصنف ${idx + 1}</strong>
+      <div class="fields">
+        <label class="field">اسم الصنف<input value="${escapeHtml(item.name)}" oninput="updateItem(${idx},'name',this.value)"></label>
+        <label class="field">السعر<input value="${escapeHtml(item.price)}" oninput="updateItem(${idx},'price',this.value)"></label>
+        <label class="field">الوصف<input value="${escapeHtml(item.description)}" oninput="updateItem(${idx},'description',this.value)"></label>
+        <label class="field">رابط صورة<input value="${escapeHtml(item.image)}" onchange="updateItem(${idx},'image',this.value)"></label>
+      </div>
+      <button class="secondary small" onclick="deleteItem(${idx})">حذف الصنف</button>
+    </div>
+  `).join('');
+}
+
+function updateSetting(key, val) {
+  menuData.settings[key] = val;
+  if (key === 'name') document.getElementById('shopTitle').textContent = val;
+  else if (key === 'tagline') document.getElementById('shopSubtitle').textContent = val;
+  else document.documentElement.style.setProperty('--' + key, val);
+}
+
+function updateItem(idx, key, val) {
+  menuData.items[idx][key] = val;
+  renderMenu();
+}
+
+function addItem() {
+  menuData.items.push({ name: "صنف جديد", price: "مجاناً", description: "وصف الصنف", image: "", qty: 0 });
+  renderEditors();
+  renderMenu();
+}
+
+function deleteItem(idx) {
+  menuData.items.splice(idx, 1);
+  renderEditors();
+  renderMenu();
+}
+
+function exportHTML() {
+  const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html;charset=utf-8'  });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'sokkar-ziyade-synced.html';
+  a.click();
+}
+
+// Initial render
+renderMenu();
+</script>
+</body>
+</html>
